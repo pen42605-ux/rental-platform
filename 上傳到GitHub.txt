@@ -1,0 +1,50 @@
+📤 上傳程式碼到 GitHub - 簡單步驟
+
+========================================
+方法 1：使用批次檔（最簡單）
+========================================
+
+1. 雙擊執行：upload-to-github.bat
+2. 等待完成
+3. 如果要求輸入帳號密碼：
+   - 帳號：你的 GitHub 帳號名稱
+   - 密碼：使用 Personal Access Token（不是 GitHub 密碼）
+
+========================================
+方法 2：手動執行指令
+========================================
+
+1. 在專案資料夾按右鍵 → 在此處開啟 PowerShell
+
+2. 執行以下指令（一行一行執行）：
+
+   git init
+   git add .
+   git commit -m "first commit"
+   git branch -M main
+   git remote add origin https://github.com/pen42605-ux/rental-platform.git
+   git push -u origin main
+
+3. 如果要求輸入帳號密碼：
+   - 帳號：pen42605-ux
+   - 密碼：使用 Personal Access Token
+
+========================================
+如何取得 Personal Access Token？
+========================================
+
+1. 前往：https://github.com/settings/tokens
+2. 點擊 "Generate new token" → "Generate new token (classic)"
+3. Note: 輸入 "upload-code"
+4. 勾選 "repo" 權限
+5. 點擊 "Generate token"
+6. 複製 Token（只會顯示一次！）
+7. 使用這個 Token 作為密碼
+
+========================================
+如果遇到問題
+========================================
+
+- Git 未安裝：https://git-scm.com/download/win
+- 需要幫助：查看 GITHUB_SETUP.md
+

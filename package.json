@@ -1,0 +1,28 @@
+{
+  "name": "rental-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "租屋平台 Monorepo - Next.js Frontend + Express Backend",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm run dev -w @rental/frontend",
+    "dev:backend": "npm run dev -w @rental/backend",
+    "build": "npm run build -w @rental/backend && npm run build -w @rental/frontend",
+    "lint": "npm run lint -w @rental/backend && npm run lint -w @rental/frontend",
+    "test": "npm run test -w @rental/backend",
+    "test:coverage": "npm run test:coverage -w @rental/backend",
+    "db:generate": "npm run db:generate -w @rental/backend",
+    "db:migrate": "npm run db:migrate -w @rental/backend",
+    "db:push": "npm run db:push -w @rental/backend",
+    "db:studio": "npm run db:studio -w @rental/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}
+
+

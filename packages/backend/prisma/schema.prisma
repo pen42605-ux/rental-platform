@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  passwordHash  String     @map("password_hash")
+  name          String
+  phone         String?
+  role          String     @default("USER")
+  avatarUrl     String?    @map("avatar_url")
+  isVerified    Boolean    @default(false) @map("is_verified")
+  isBlocked     Boolean    @default(false) @map("is_blocked")
+  blockedAt     DateTime?  @map("blocked_at")
+  blockedReason String?    @map("blocked_reason")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  listings      Listing[]
+  favorites     Favorite[]
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[] @relation("TargetUser")
+  adminActions  AuditLog[] @relation("AdminUser")
+
+  @@map("users")
+}
+
+model Listing {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  title           String
+  description     String?
+  price           Int
+  currency        String    @default("TWD")
+  propertyType    String    @map("property_type")
+  beds            Int       @default(1)
+  baths           Int       @default(1)
+  area            Float?
+  address         String?
+  city            String?
+  district        String?
+  latitude        Float?
+  longitude       Float?
+  amenities       String    @default("[]")
+  status          String    @default("DRAFT")
+  viewCount       Int       @default(0) @map("view_count")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images          ListingImage[]
+  favorites       Favorite[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([propertyType])
+  @@index([price])
+  @@map("listings")
+}
+
+model ListingImage {
+  id          String   @id @default(uuid())
+  listingId   String   @map("listing_id")
+  key         String
+  url         String
+  bucket      String
+  filename    String
+  mimeType    String   @map("mime_type")
+  size        Int
+  width       Int?
+  height      Int?
+  isCover     Boolean  @default(false) @map("is_cover")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("listing_images")
+}
+
+model Favorite {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  listingId   String   @map("listing_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  token       String   @unique
+  expiresAt   DateTime @map("expires_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model AuditLog {
+  id            String    @id @default(uuid())
+  adminId       String    @map("admin_id")
+  action        String
+  entityType    String    @map("entity_type")
+  entityId      String    @map("entity_id")
+  targetUserId  String?   @map("target_user_id")
+  previousValue String?   @map("previous_value")
+  newValue      String?   @map("new_value")
+  reason        String?
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  admin         User      @relation("AdminUser", fields: [adminId], references: [id])
+  targetUser    User?     @relation("TargetUser", fields: [targetUserId], references: [id])
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([targetUserId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
