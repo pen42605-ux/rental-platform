@@ -112,7 +112,20 @@ export default function ImageUploader({
     } catch (error: any) {
       console.error('Upload error:', error);
       updateImageStatus(image.id, 'error', 0, allImages);
-      toast.error(`${image.filename} 上傳失敗`);
+      
+      // 顯示詳細錯誤訊息
+      let errorMessage = `${image.filename} 上傳失敗`;
+      if (error.response?.data?.error?.message) {
+        errorMessage = error.response.data.error.message;
+      } else if (error.response?.data?.error?.code === 'S3_NOT_CONFIGURED') {
+        errorMessage = 'S3 未配置，請聯繫管理員';
+      } else if (error.response?.status === 401) {
+        errorMessage = '請先登入';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 

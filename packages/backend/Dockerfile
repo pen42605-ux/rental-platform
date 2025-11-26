@@ -45,3 +45,7 @@ EXPOSE 4000
 # Start application
 CMD ["node", "dist/index.js"]
 
+
+
+
+

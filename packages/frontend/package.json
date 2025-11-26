@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.19",
     "@heroicons/react": "^2.2.0",
+    "@sentry/nextjs": "^7.120.4",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
@@ -37,4 +38,3 @@
     "typescript": "^5.3.3"
   }
 }
-

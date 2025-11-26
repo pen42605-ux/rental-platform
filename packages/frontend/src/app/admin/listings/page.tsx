@@ -86,7 +86,7 @@ export default function AdminListingsPage() {
       const params: any = { page: pagination.page, limit: 20 };
       if (selectedStatus) params.status = selectedStatus;
 
-      const res = await api.get('/admin/listings', { params });
+      const res = await api.get('/api/admin/listings', { params });
       setListings(res.data.data.listings);
       setPagination(res.data.data.pagination);
     } catch (error) {
@@ -119,7 +119,7 @@ export default function AdminListingsPage() {
 
     setProcessing(true);
     try {
-      const endpoint = `/admin/listings/${actionModal.listing.id}/${actionModal.type}`;
+      const endpoint = `/api/admin/listings/${actionModal.listing.id}/${actionModal.type}`;
       await api.post(endpoint, { reason: reason.trim() || undefined });
 
       toast.success(

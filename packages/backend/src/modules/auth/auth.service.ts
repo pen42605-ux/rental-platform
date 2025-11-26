@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import prisma from '../../lib/prisma';
 import { config } from '../../config';
 import { AppError } from '../../middleware/errorHandler';
+import { verificationService } from './verification.service';
 
 // ==================== 類型定義 ====================
 
@@ -15,6 +16,44 @@ export interface RegisterInput {
   password: string;
   name: string;
   phone?: string;
+  gender?: 'MALE' | 'FEMALE';
+  referralSource?: string;
+  
+  // 聯絡資訊
+  lineUrl?: string;
+  
+  // 緊急聯絡人（AGENT, AGENCY 需要）
+  emergencyContactRelation?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  
+  // 工作相關（AGENT, AGENCY 需要）
+  workArea?: string;
+  companyId?: string;
+  companyName?: string;
+  branchId?: string;
+  branchName?: string;
+  branchType?: 'DIRECT' | 'FRANCHISE';
+  position?: string;
+  brokerageName?: string;
+  hideCompanyInfo?: boolean;
+  
+  // 公司相關（AGENCY, DEVELOPER 需要）
+  accountType?: 'GROUP' | 'BRANCH' | 'OTHER';
+  companyNameFull?: string;
+  
+  // 發票相關
+  invoiceMethod?: 'DONATE' | 'CLOUD' | 'UNIFIED' | 'MOBILE';
+  unifiedNumber?: string;
+  invoiceBuyer?: string;
+  invoicePhone?: string;
+  invoiceCity?: string;
+  invoiceDistrict?: string;
+  invoiceAddress?: string;
+  mobileCarrier?: string;
+  
+  verificationCode?: string; // 手機驗證碼
+  role?: 'USER' | 'LANDLORD' | 'AGENT' | 'AGENCY' | 'DEVELOPER';
 }
 
 export interface LoginInput {
@@ -45,7 +84,19 @@ export class AuthService {
    * 註冊新使用者
    */
   async register(input: RegisterInput): Promise<{ user: any; tokens: AuthTokens }> {
-    const { email, password, name, phone } = input;
+    const { email, password, name, phone, verificationCode, role } = input;
+
+    // 如果是 USER 或 LANDLORD 角色且有手機號碼，驗證驗證碼
+    if ((role === 'USER' || role === 'LANDLORD') && phone) {
+      if (!verificationCode) {
+        throw new AppError('請輸入手機驗證碼', 400, 'VERIFICATION_CODE_REQUIRED');
+      }
+
+      const isValid = await verificationService.verifyCode(phone, verificationCode);
+      if (!isValid) {
+        throw new AppError('手機驗證碼錯誤或已過期', 400, 'INVALID_VERIFICATION_CODE');
+      }
+    }
 
     // 檢查 email 是否已存在
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -62,8 +113,33 @@ export class AuthService {
         email,
         passwordHash,
         name,
-        phone,
-        role: 'USER',
+        phone: phone || null,
+        role: input.role || 'USER',
+        gender: input.gender || null,
+        referralSource: input.referralSource || null,
+        lineUrl: input.lineUrl || null,
+        emergencyContactRelation: input.emergencyContactRelation || null,
+        emergencyContactName: input.emergencyContactName || null,
+        emergencyContactPhone: input.emergencyContactPhone || null,
+        workArea: input.workArea || null,
+        companyId: input.companyId || null,
+        companyName: input.companyName || null,
+        branchId: input.branchId || null,
+        branchName: input.branchName || null,
+        branchType: input.branchType || null,
+        position: input.position || null,
+        brokerageName: input.brokerageName || null,
+        hideCompanyInfo: input.hideCompanyInfo || false,
+        accountType: input.accountType || null,
+        companyNameFull: input.companyNameFull || null,
+        invoiceMethod: input.invoiceMethod || null,
+        unifiedNumber: input.unifiedNumber || null,
+        invoiceBuyer: input.invoiceBuyer || null,
+        invoicePhone: input.invoicePhone || null,
+        invoiceCity: input.invoiceCity || null,
+        invoiceDistrict: input.invoiceDistrict || null,
+        invoiceAddress: input.invoiceAddress || null,
+        mobileCarrier: input.mobileCarrier || null,
       },
       select: {
         id: true,
@@ -257,6 +333,91 @@ export class AuthService {
       refreshToken,
       expiresIn: 900, // 15 minutes in seconds
     };
+  }
+
+  /**
+   * Facebook OAuth 登入/註冊
+   */
+  async facebookLogin(accessToken: string): Promise<{ user: any; tokens: AuthTokens }> {
+    try {
+      // 驗證 Facebook access token 並取得用戶資訊
+      const response = await fetch(
+        `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${accessToken}`
+      );
+
+      if (!response.ok) {
+        throw new AppError('Facebook 登入失敗', 401, 'FACEBOOK_AUTH_FAILED');
+      }
+
+      const facebookUser = await response.json();
+
+      if (!facebookUser.email) {
+        throw new AppError('無法取得 Facebook Email，請確認已授權 Email 權限', 400, 'FACEBOOK_EMAIL_REQUIRED');
+      }
+
+      // 查找或創建用戶
+      let user = await prisma.user.findUnique({
+        where: { email: facebookUser.email },
+      });
+
+      if (!user) {
+        // 創建新用戶（OAuth 用戶使用隨機密碼 hash，因為 passwordHash 是必填欄位）
+        const randomPassword = crypto.randomBytes(32).toString('hex');
+        const passwordHash = await bcrypt.hash(randomPassword, this.saltRounds);
+        
+        user = await prisma.user.create({
+          data: {
+            email: facebookUser.email,
+            name: facebookUser.name || 'Facebook User',
+            passwordHash, // OAuth 用戶使用隨機密碼（不會被使用）
+            avatarUrl: facebookUser.picture?.data?.url || null,
+            isVerified: true, // Facebook 帳號視為已驗證
+            role: 'USER',
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+            role: true,
+            avatarUrl: true,
+            isVerified: true,
+            createdAt: true,
+          },
+        });
+      } else {
+        // 更新頭像（如果有的話）
+        if (facebookUser.picture?.data?.url && !user.avatarUrl) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { avatarUrl: facebookUser.picture.data.url },
+          });
+          user.avatarUrl = facebookUser.picture.data.url;
+        }
+      }
+
+      // 生成 tokens
+      const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+        },
+        tokens,
+      };
+    } catch (error: any) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Facebook 登入失敗', 500, 'FACEBOOK_AUTH_ERROR');
+    }
   }
 }
 

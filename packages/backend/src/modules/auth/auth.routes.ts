@@ -169,4 +169,87 @@ router.post('/reset-password', (req, res, next) => authController.resetPassword(
  */
 router.get('/me', authenticate, (req, res, next) => authController.me(req, res, next));
 
+/**
+ * @swagger
+ * /api/auth/facebook:
+ *   post:
+ *     summary: Facebook OAuth 登入/註冊
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [accessToken]
+ *             properties:
+ *               accessToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 登入成功
+ *       400:
+ *         description: 驗證失敗
+ */
+router.post('/facebook', (req, res, next) => authController.facebookLogin(req, res, next));
+
+// 手機驗證碼路由
+import { verificationController } from './verification.controller';
+
+/**
+ * @swagger
+ * /api/auth/verification/send:
+ *   post:
+ *     summary: 發送手機驗證碼
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 pattern: '^09\d{8}$'
+ *     responses:
+ *       200:
+ *         description: 驗證碼已發送
+ *       429:
+ *         description: 發送過於頻繁
+ */
+router.post('/verification/send', (req, res, next) =>
+  verificationController.sendCode(req, res, next)
+);
+
+/**
+ * @swagger
+ * /api/auth/verification/verify:
+ *   post:
+ *     summary: 驗證手機驗證碼
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone, code]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               code:
+ *                 type: string
+ *                 length: 6
+ *     responses:
+ *       200:
+ *         description: 驗證成功
+ *       400:
+ *         description: 驗證碼錯誤
+ */
+router.post('/verification/verify', (req, res, next) =>
+  verificationController.verifyCode(req, res, next)
+);
+
 export default router;

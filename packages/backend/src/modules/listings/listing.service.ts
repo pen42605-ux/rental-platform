@@ -31,7 +31,9 @@ function formatListingResponse(listing: any): ListingResponse {
     district: listing.district,
     latitude: listing.latitude ? Number(listing.latitude) : null,
     longitude: listing.longitude ? Number(listing.longitude) : null,
-    amenities: listing.amenities as string[],
+    amenities: typeof listing.amenities === 'string' 
+      ? JSON.parse(listing.amenities) 
+      : (listing.amenities || []),
     status: listing.status,
     viewCount: listing.viewCount,
     userId: listing.userId,
@@ -65,19 +67,19 @@ export class ListingService {
       data: {
         userId,
         title: listingData.title,
-        description: listingData.description,
+        description: listingData.description || null,
         price: listingData.price,
         currency: listingData.currency || 'TWD',
         propertyType: listingData.propertyType,
         beds: listingData.beds || 1,
         baths: listingData.baths || 1,
-        area: listingData.area,
-        address: listingData.address,
-        city: listingData.city,
-        district: listingData.district,
-        latitude: listingData.latitude,
-        longitude: listingData.longitude,
-        amenities: listingData.amenities || [],
+        area: listingData.area ?? null,
+        address: listingData.address || null,
+        city: listingData.city, // 必填，已在 controller 驗證
+        district: listingData.district, // 必填，已在 controller 驗證
+        latitude: listingData.latitude ?? null,
+        longitude: listingData.longitude ?? null,
+        amenities: JSON.stringify(listingData.amenities || []),
         status: listingData.status || 'DRAFT',
         images: images ? {
           create: images.map((img, index) => ({
@@ -87,8 +89,8 @@ export class ListingService {
             filename: img.filename,
             mimeType: img.mimeType,
             size: img.size,
-            width: img.width,
-            height: img.height,
+            width: img.width ?? null,
+            height: img.height ?? null,
             isCover: img.isCover ?? index === 0,
             sortOrder: img.sortOrder ?? index,
           })),
@@ -145,19 +147,33 @@ export class ListingService {
       where: { id: listingId },
       data: {
         ...(updateData.title && { title: updateData.title }),
-        ...(updateData.description !== undefined && { description: updateData.description }),
+        ...(updateData.description !== undefined && { 
+          description: updateData.description || null 
+        }),
         ...(updateData.price !== undefined && { price: updateData.price }),
         ...(updateData.currency && { currency: updateData.currency }),
         ...(updateData.propertyType && { propertyType: updateData.propertyType }),
         ...(updateData.beds !== undefined && { beds: updateData.beds }),
         ...(updateData.baths !== undefined && { baths: updateData.baths }),
-        ...(updateData.area !== undefined && { area: updateData.area }),
-        ...(updateData.address !== undefined && { address: updateData.address }),
-        ...(updateData.city !== undefined && { city: updateData.city }),
-        ...(updateData.district !== undefined && { district: updateData.district }),
-        ...(updateData.latitude !== undefined && { latitude: updateData.latitude }),
-        ...(updateData.longitude !== undefined && { longitude: updateData.longitude }),
-        ...(updateData.amenities && { amenities: updateData.amenities }),
+        ...(updateData.area !== undefined && { 
+          area: updateData.area ?? null 
+        }),
+        ...(updateData.address !== undefined && { 
+          address: updateData.address || null 
+        }),
+        ...(updateData.city !== undefined && { 
+          city: updateData.city || null 
+        }),
+        ...(updateData.district !== undefined && { 
+          district: updateData.district || null 
+        }),
+        ...(updateData.latitude !== undefined && { 
+          latitude: updateData.latitude ?? null 
+        }),
+        ...(updateData.longitude !== undefined && { 
+          longitude: updateData.longitude ?? null 
+        }),
+        ...(updateData.amenities && { amenities: JSON.stringify(updateData.amenities) }),
         ...(updateData.status && { status: updateData.status }),
         // 新增圖片
         ...(addImages && {
@@ -169,8 +185,8 @@ export class ListingService {
               filename: img.filename,
               mimeType: img.mimeType,
               size: img.size,
-              width: img.width,
-              height: img.height,
+              width: img.width ?? null,
+              height: img.height ?? null,
               isCover: img.isCover ?? false,
               sortOrder: img.sortOrder ?? 100 + index,
             })),

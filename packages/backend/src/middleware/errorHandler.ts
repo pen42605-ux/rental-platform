@@ -2,6 +2,8 @@
  * 全域錯誤處理中間件
  */
 import { Request, Response, NextFunction } from 'express';
+import * as Sentry from '@sentry/node';
+import { logger } from '../lib/logger';
 
 export class AppError extends Error {
   statusCode: number;
@@ -21,7 +23,30 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error('Error:', err);
+  // 記錄錯誤
+  logger.error('Error occurred', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+  });
+
+  // 發送到 Sentry（僅 5xx 錯誤）
+  if (!(err instanceof AppError) || err.statusCode >= 500) {
+    Sentry.captureException(err, {
+      tags: {
+        url: req.url,
+        method: req.method,
+      },
+      extra: {
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      },
+    });
+  }
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({

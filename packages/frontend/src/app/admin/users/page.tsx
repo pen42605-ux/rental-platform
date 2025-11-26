@@ -27,14 +27,20 @@ interface User {
 }
 
 const roleLabels: Record<string, string> = {
-  USER: '一般使用者',
-  LANDLORD: '房東',
+  USER: '房客/買家',
+  LANDLORD: '屋主/代理人',
+  AGENT: '營業員/經紀人',
+  AGENCY: '仲介公司',
+  DEVELOPER: '建商/代銷',
   ADMIN: '管理員',
 };
 
 const roleStyles: Record<string, string> = {
   USER: 'bg-slate-500/20 text-slate-400',
   LANDLORD: 'bg-blue-500/20 text-blue-400',
+  AGENT: 'bg-green-500/20 text-green-400',
+  AGENCY: 'bg-cyan-500/20 text-cyan-400',
+  DEVELOPER: 'bg-orange-500/20 text-orange-400',
   ADMIN: 'bg-purple-500/20 text-purple-400',
 };
 
@@ -62,7 +68,7 @@ export default function AdminUsersPage() {
       if (search) params.search = search;
       if (filterBlocked !== undefined) params.isBlocked = filterBlocked;
 
-      const res = await api.get('/admin/users', { params });
+      const res = await api.get('/api/admin/users', { params });
       setUsers(res.data.data.users);
       setPagination(res.data.data.pagination);
     } catch (error) {
@@ -91,7 +97,7 @@ export default function AdminUsersPage() {
 
     setProcessing(true);
     try {
-      const endpoint = `/admin/users/${actionModal.user.id}/${actionModal.type}`;
+      const endpoint = `/api/admin/users/${actionModal.user.id}/${actionModal.type}`;
       await api.post(endpoint, { reason: reason.trim() || undefined });
 
       toast.success(

@@ -26,6 +26,10 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 *.log
+logs/
+packages/backend/logs/
+uploads/
+packages/backend/uploads/
 
 # OS
 .DS_Store

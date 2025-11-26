@@ -106,7 +106,7 @@ export default function AdminListingDetailPage() {
   useEffect(() => {
     const fetchListing = async () => {
       try {
-        const res = await api.get(`/admin/listings/${params.id}`);
+        const res = await api.get(`/api/admin/listings/${params.id}`);
         setData(res.data.data);
       } catch (error) {
         console.error('Failed to fetch listing:', error);
@@ -128,7 +128,7 @@ export default function AdminListingDetailPage() {
 
     setProcessing(true);
     try {
-      await api.post(`/admin/listings/${data.listing.id}/${actionModal}`, {
+      await api.post(`/api/admin/listings/${data.listing.id}/${actionModal}`, {
         reason: reason.trim() || undefined,
       });
 

@@ -72,7 +72,7 @@ export default function AdminAuditPage() {
       if (startDate) params.startDate = new Date(startDate).toISOString();
       if (endDate) params.endDate = new Date(endDate + 'T23:59:59').toISOString();
 
-      const res = await api.get('/admin/audit-logs', { params });
+      const res = await api.get('/api/admin/audit-logs', { params });
       setLogs(res.data.data.logs);
       setPagination(res.data.data.pagination);
     } catch (error) {

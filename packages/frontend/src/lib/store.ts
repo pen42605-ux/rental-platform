@@ -48,7 +48,26 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         const state = get();
         if (state.accessToken && state.user) {
-          set({ isAuthenticated: true });
+          // 驗證 token 是否有效
+          try {
+            const { api } = await import('./api');
+            const response = await api.get('/api/auth/me');
+            if (response.data.success) {
+              set({ 
+                isAuthenticated: true,
+                user: response.data.data 
+              });
+            } else {
+              set({ isAuthenticated: false, user: null, accessToken: null, refreshToken: null });
+            }
+          } catch (error) {
+            // Token 無效，清除認證狀態
+            set({ isAuthenticated: false, user: null, accessToken: null, refreshToken: null });
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
+            }
+          }
         } else {
           set({ isAuthenticated: false, user: null, accessToken: null, refreshToken: null });
         }

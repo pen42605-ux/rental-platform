@@ -109,31 +109,39 @@ class SyncQueue {
       },
     });
 
-    const documents: ListingDocument[] = listings.map(listing => ({
-      id: listing.id,
-      title: listing.title,
-      description: listing.description,
-      price: listing.price,
-      currency: listing.currency,
-      propertyType: listing.propertyType,
-      beds: listing.beds,
-      baths: listing.baths,
-      area: listing.area ? Number(listing.area) : null,
-      address: listing.address,
-      city: listing.city,
-      district: listing.district,
-      _geo: listing.latitude && listing.longitude
-        ? { lat: Number(listing.latitude), lng: Number(listing.longitude) }
-        : null,
-      amenities: listing.amenities as string[],
-      status: listing.status,
-      coverImage: listing.images[0]?.url || null,
-      viewCount: listing.viewCount,
-      userId: listing.userId,
-      userName: listing.user.name,
-      createdAt: listing.createdAt.getTime(),
-      updatedAt: listing.updatedAt.getTime(),
-    }));
+    const documents: ListingDocument[] = listings.map(listing => {
+      const amenities: string[] =
+        typeof listing.amenities === 'string'
+          ? (JSON.parse(listing.amenities) as string[])
+          : (listing.amenities || []);
+
+      return {
+        id: listing.id,
+        title: listing.title,
+        description: listing.description,
+        price: listing.price,
+        currency: listing.currency,
+        propertyType: listing.propertyType,
+        beds: listing.beds,
+        baths: listing.baths,
+        area: listing.area ? Number(listing.area) : null,
+        address: listing.address,
+        city: listing.city,
+        district: listing.district,
+        _geo:
+          listing.latitude && listing.longitude
+            ? { lat: Number(listing.latitude), lng: Number(listing.longitude) }
+            : null,
+        amenities,
+        status: listing.status,
+        coverImage: listing.images[0]?.url || null,
+        viewCount: listing.viewCount,
+        userId: listing.userId,
+        userName: listing.user.name,
+        createdAt: listing.createdAt.getTime(),
+        updatedAt: listing.updatedAt.getTime(),
+      };
+    });
 
     await meilisearchService.indexDocuments(documents);
   }
@@ -231,31 +239,42 @@ class SyncWorker {
       if (listings.length === 0) break;
 
       try {
-        const documents: ListingDocument[] = listings.map(listing => ({
-          id: listing.id,
-          title: listing.title,
-          description: listing.description,
-          price: listing.price,
-          currency: listing.currency,
-          propertyType: listing.propertyType,
-          beds: listing.beds,
-          baths: listing.baths,
-          area: listing.area ? Number(listing.area) : null,
-          address: listing.address,
-          city: listing.city,
-          district: listing.district,
-          _geo: listing.latitude && listing.longitude
-            ? { lat: Number(listing.latitude), lng: Number(listing.longitude) }
-            : null,
-          amenities: listing.amenities as string[],
-          status: listing.status,
-          coverImage: listing.images[0]?.url || null,
-          viewCount: listing.viewCount,
-          userId: listing.userId,
-          userName: listing.user.name,
-          createdAt: listing.createdAt.getTime(),
-          updatedAt: listing.updatedAt.getTime(),
-        }));
+        const documents: ListingDocument[] = listings.map(listing => {
+          const amenities: string[] =
+            typeof listing.amenities === 'string'
+              ? (JSON.parse(listing.amenities) as string[])
+              : (listing.amenities || []);
+
+          return {
+            id: listing.id,
+            title: listing.title,
+            description: listing.description,
+            price: listing.price,
+            currency: listing.currency,
+            propertyType: listing.propertyType,
+            beds: listing.beds,
+            baths: listing.baths,
+            area: listing.area ? Number(listing.area) : null,
+            address: listing.address,
+            city: listing.city,
+            district: listing.district,
+            _geo:
+              listing.latitude && listing.longitude
+                ? {
+                    lat: Number(listing.latitude),
+                    lng: Number(listing.longitude),
+                  }
+                : null,
+            amenities,
+            status: listing.status,
+            coverImage: listing.images[0]?.url || null,
+            viewCount: listing.viewCount,
+            userId: listing.userId,
+            userName: listing.user.name,
+            createdAt: listing.createdAt.getTime(),
+            updatedAt: listing.updatedAt.getTime(),
+          };
+        });
 
         await meilisearchService.indexDocuments(documents);
         indexed += documents.length;
@@ -299,5 +318,9 @@ export function emitListingDeleted(listingId: string): void {
 // ==================== 匯出 ====================
 
 export const syncWorker = new SyncWorker();
+
+
+
+
 
 

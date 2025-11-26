@@ -7,6 +7,7 @@ import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { listingsApi } from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
 import { PROPERTY_TYPE_MAP, AMENITIES_LIST, CITIES } from '@/lib/utils';
+import { getDistrictsByCity } from '@/lib/districts';
 import ImageUploader, { UploadedImage } from '@/components/upload/ImageUploader';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
@@ -82,6 +83,14 @@ export default function CreateListingPage() {
       toast.error('請輸入租金');
       return;
     }
+    if (!formData.city) {
+      toast.error('請選擇縣市');
+      return;
+    }
+    if (!formData.district.trim()) {
+      toast.error('請輸入區域');
+      return;
+    }
 
     // 檢查圖片上傳狀態
     const pendingImages = images.filter((img) => img.status !== 'done');
@@ -98,6 +107,8 @@ export default function CreateListingPage() {
         area: formData.area ? Number(formData.area) : undefined,
         latitude: formData.latitude ? Number(formData.latitude) : undefined,
         longitude: formData.longitude ? Number(formData.longitude) : undefined,
+        city: formData.city.trim(),
+        district: formData.district.trim(),
         status: publish ? 'PUBLISHED' : 'DRAFT',
         images: images
           .filter((img) => img.status === 'done')
@@ -336,29 +347,65 @@ export default function CreateListingPage() {
               {/* 地址 */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-secondary-700 font-medium mb-2">縣市</label>
+                  <label className="block text-secondary-700 font-medium mb-2">
+                    縣市 <span className="text-red-500">*</span>
+                  </label>
                   <select
                     value={formData.city}
-                    onChange={(e) => updateField('city', e.target.value)}
-                    className="input"
+                    onChange={(e) => {
+                      updateField('city', e.target.value);
+                      // 選擇縣市後，清空區域（因為不同縣市的區域不同）
+                      updateField('district', '');
+                    }}
+                    className={`input ${!formData.city ? 'border-red-300' : ''}`}
+                    required
                   >
-                    <option value="">請選擇</option>
+                    <option value="">請選擇縣市</option>
                     {CITIES.map((city) => (
                       <option key={city} value={city}>
                         {city}
                       </option>
                     ))}
                   </select>
+                  {!formData.city && (
+                    <p className="text-red-500 text-sm mt-1">請選擇縣市</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-secondary-700 font-medium mb-2">區域</label>
-                  <input
-                    type="text"
-                    value={formData.district}
-                    onChange={(e) => updateField('district', e.target.value)}
-                    placeholder="例：大安區"
-                    className="input"
-                  />
+                  <label className="block text-secondary-700 font-medium mb-2">
+                    區域 <span className="text-red-500">*</span>
+                  </label>
+                  {formData.city && getDistrictsByCity(formData.city).length > 0 ? (
+                    <select
+                      value={formData.district}
+                      onChange={(e) => updateField('district', e.target.value)}
+                      className={`input ${!formData.district ? 'border-red-300' : ''}`}
+                      required
+                    >
+                      <option value="">請選擇區域</option>
+                      {getDistrictsByCity(formData.city).map((district) => (
+                        <option key={district} value={district}>
+                          {district}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={formData.district}
+                      onChange={(e) => updateField('district', e.target.value)}
+                      placeholder="例：大安區"
+                      className={`input ${!formData.district.trim() ? 'border-red-300' : ''}`}
+                      required
+                      disabled={!formData.city}
+                    />
+                  )}
+                  {!formData.district.trim() && (
+                    <p className="text-red-500 text-sm mt-1">請選擇或輸入區域</p>
+                  )}
+                  {!formData.city && (
+                    <p className="text-secondary-400 text-sm mt-1">請先選擇縣市</p>
+                  )}
                 </div>
               </div>
 
@@ -455,7 +502,23 @@ export default function CreateListingPage() {
 
             <div className="flex gap-3">
               {step < 3 ? (
-                <button onClick={() => setStep(step + 1)} className="btn-primary">
+                <button 
+                  onClick={() => {
+                    // 驗證步驟 2 的必填欄位
+                    if (step === 2) {
+                      if (!formData.city) {
+                        toast.error('請選擇縣市');
+                        return;
+                      }
+                      if (!formData.district.trim()) {
+                        toast.error('請輸入區域');
+                        return;
+                      }
+                    }
+                    setStep(step + 1);
+                  }} 
+                  className="btn-primary"
+                >
                   下一步
                 </button>
               ) : (

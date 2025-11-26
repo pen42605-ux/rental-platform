@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { meilisearchService } from './meilisearch.service';
 import { syncWorker } from './sync.worker';
 import { AuthRequest } from '../../middleware/auth.middleware';
+import { logSearchMetrics } from './search.monitoring';
 
 // ==================== 驗證 Schema ====================
 
@@ -60,7 +61,16 @@ export class SearchController {
         });
       }
 
+      const startTime = Date.now();
       const result = await meilisearchService.search(params);
+      const responseTime = Date.now() - startTime;
+
+      // 記錄搜尋效能
+      logSearchMetrics({
+        query: params.q || '',
+        responseTime,
+        resultCount: result.totalItems,
+      });
 
       res.json({
         success: true,

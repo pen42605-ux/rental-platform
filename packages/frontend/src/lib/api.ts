@@ -3,7 +3,13 @@
  */
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// 獲取 API URL
+// 優先使用 NEXT_PUBLIC_API_URL，否則使用「同源」(相對路徑)，方便在只有前端時本機開發
+// 這樣 /api/* 會直接打到 Next.js 自己的 API routes，而不是一定要有後端 4000 埠
+const API_BASE_URL =
+typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL
+  ? process.env.NEXT_PUBLIC_API_URL
+  : 'http://localhost:4000';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -16,7 +22,20 @@ export const api = axios.create({
 // 請求攔截器 - 自動附加 token
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('accessToken');
+    // 優先從 localStorage 讀取
+    let token = localStorage.getItem('accessToken');
+    // 如果沒有，嘗試從 Zustand store 讀取
+    if (!token) {
+      try {
+        const authStorage = localStorage.getItem('auth-storage');
+        if (authStorage) {
+          const parsed = JSON.parse(authStorage);
+          token = parsed?.state?.accessToken;
+        }
+      } catch (e) {
+        // 忽略解析錯誤
+      }
+    }
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,11 +48,15 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<{ error?: { message: string } }>) => {
     if (error.response?.status === 401) {
-      // Token 過期，嘗試刷新
-      // TODO: 實作 refresh token 邏輯
+      // Token 過期或無效，清除認證狀態
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('auth-storage');
+        // 如果不是在登入頁面，重定向到登入頁
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }
       }
     }
     return Promise.reject(error);
@@ -167,11 +190,25 @@ export const uploadApi = {
     api.post<ApiResponse<PresignResponse[]>>('/api/uploads/presign-batch', { files }),
 
   uploadToS3: async (uploadUrl: string, file: File) => {
-    await axios.put(uploadUrl, file, {
-      headers: {
-        'Content-Type': file.type,
-      },
-    });
+    // 如果是本地儲存（uploadUrl 以 /api/uploads/local/ 開頭）
+    if (uploadUrl.startsWith('/api/uploads/local/') || uploadUrl.includes('/local/')) {
+      const formData = new FormData();
+      formData.append('file', file);
+      // 使用 api 實例（會自動加上 baseURL 和認證）
+      // uploadUrl 已經是相對路徑，api 實例會自動加上 baseURL
+      await api.post(uploadUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    } else {
+      // S3 上傳（直接使用完整 URL，不需要認證）
+      await axios.put(uploadUrl, file, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+    }
   },
 };
 
@@ -188,6 +225,74 @@ export const authApi = {
 
   me: () =>
     api.get<ApiResponse<any>>('/api/auth/me'),
+};
+
+// 支付相關類型
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: string;
+  totalAmount: number;
+  currency: string;
+  items: Array<{
+    id: string;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }>;
+  createdAt: string;
+  expiresAt: string | null;
+}
+
+export interface Payment {
+  id: string;
+  paymentNumber: string;
+  paymentUrl?: string;
+  bankCode?: string;
+  accountNumber?: string;
+  expireDate?: string;
+  transactionId?: string;
+  status: string;
+  paymentMethod?: string;
+}
+
+export interface CreateOrderInput {
+  items: Array<{
+    productId: string;
+    quantity: number;
+    metadata?: Record<string, any>;
+  }>;
+  notes?: string;
+}
+
+export interface CreatePaymentInput {
+  orderId: string;
+  paymentMethod: 'CREDIT_CARD' | 'ATM' | 'CVS' | 'WEBATM' | 'LINE_PAY' | 'APPLE_PAY' | 'GOOGLE_PAY';
+  paymentProvider?: 'MOCK' | 'ECPAY' | 'NEWEBPAY' | 'LINE_PAY';
+}
+
+// 支付相關
+export const paymentApi = {
+  // 創建訂單
+  createOrder: (data: CreateOrderInput) =>
+    api.post<ApiResponse<Order>>('/api/payment/orders', data),
+
+  // 獲取訂單列表
+  getOrders: (params?: { page?: number; limit?: number; status?: string }) =>
+    api.get<ApiResponse<{ items: Order[]; pagination: any }>>('/api/payment/orders', { params }),
+
+  // 獲取訂單詳情
+  getOrder: (id: string) =>
+    api.get<ApiResponse<Order>>(`/api/payment/orders/${id}`),
+
+  // 創建付款
+  createPayment: (data: CreatePaymentInput) =>
+    api.post<ApiResponse<Payment>>('/api/payment/payments', data),
+
+  // 查詢付款狀態
+  getPaymentStatus: (transactionId: string) =>
+    api.get<ApiResponse<{ status: string }>>(`/api/payment/payments/${transactionId}/status`),
 };
 
 export default api;

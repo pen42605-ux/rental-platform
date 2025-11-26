@@ -4,6 +4,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { uploadService } from './upload.service';
+import { localUploadService } from './local-upload.service';
 import { AuthRequest } from '../../middleware/auth.middleware';
 
 // ==================== 驗證 Schema ====================
@@ -71,6 +72,37 @@ export class UploadController {
           },
         });
       }
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/uploads/local/:key
+   * 本地上傳端點
+   */
+  async localUpload(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { key } = req.params;
+      
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'NO_FILE',
+            message: '未提供檔案',
+          },
+        });
+      }
+
+      // 儲存檔案
+      await localUploadService.saveFile(key, req.file.buffer);
+
+      res.json({
+        success: true,
+        message: '上傳成功',
+        data: { key },
+      });
+    } catch (error) {
       next(error);
     }
   }

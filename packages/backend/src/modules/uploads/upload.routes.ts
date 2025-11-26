@@ -2,8 +2,17 @@
  * 上傳路由
  */
 import { Router } from 'express';
+import multer from 'multer';
 import { uploadController } from './upload.controller';
 import { authenticate } from '../../middleware/auth.middleware';
+
+// Multer 設定（用於本地上傳）
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+  },
+});
 
 const router = Router();
 
@@ -102,5 +111,13 @@ router.post('/presign', authenticate, (req, res, next) => uploadController.presi
  *         description: 成功
  */
 router.post('/presign-batch', authenticate, (req, res, next) => uploadController.presignBatch(req, res, next));
+
+/**
+ * POST /api/uploads/local/:key
+ * 本地上傳端點（當 S3 未配置時使用）
+ */
+router.post('/local/:key', authenticate, upload.single('file'), (req, res, next) => 
+  uploadController.localUpload(req, res, next)
+);
 
 export default router;

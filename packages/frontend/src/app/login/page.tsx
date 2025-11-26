@@ -7,6 +7,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
 import toast from 'react-hot-toast';
+import FacebookLoginButton from '@/components/auth/FacebookLoginButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,7 +47,40 @@ export default function LoginPage() {
       toast.success('登入成功！');
       router.push(redirect);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || '登入失敗');
+      // 詳細錯誤處理
+      let errorMessage = '登入失敗';
+      
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        errorMessage = '無法連接到伺服器，請確認後端服務是否運行';
+        console.error('連接錯誤:', {
+          apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+          error: error.message,
+        });
+      } else if (error.response) {
+        // 伺服器有回應
+        errorMessage = 
+          error.response?.data?.error?.message || 
+          error.response?.data?.message || 
+          `登入失敗 (${error.response.status})`;
+        
+        if (error.response.status === 401) {
+          errorMessage = 'Email 或密碼錯誤';
+        } else if (error.response.status === 500) {
+          errorMessage = '伺服器錯誤，請稍後再試';
+        }
+      } else if (error.request) {
+        // 請求已發送但沒有收到回應
+        errorMessage = '伺服器無回應，請確認後端服務是否運行';
+      }
+      
+      toast.error(errorMessage);
+      console.error('Login error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status,
+        apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+      });
     } finally {
       setLoading(false);
     }
@@ -148,6 +182,22 @@ export default function LoginPage() {
               >
                 {loading ? '登入中...' : '登入'}
               </button>
+              
+              {/* Facebook Login */}
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-600"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-slate-800 text-slate-400">或</span>
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <FacebookLoginButton onLoading={setLoading} />
+                </div>
+              </div>
             </form>
           ) : (
             // Register Form
@@ -236,13 +286,22 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-slate-400">
               {isRegister ? '已有帳號？' : '還沒有帳號？'}
-              <button
-                type="button"
-                onClick={() => setIsRegister(!isRegister)}
-                className="ml-2 text-amber-400 hover:text-amber-300 font-medium transition-colors"
-              >
-                {isRegister ? '立即登入' : '立即註冊'}
-              </button>
+              {isRegister ? (
+                <button
+                  type="button"
+                  onClick={() => setIsRegister(!isRegister)}
+                  className="ml-2 text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                >
+                  立即登入
+                </button>
+              ) : (
+                <Link
+                  href={`/register/role?redirect=${encodeURIComponent(redirect)}`}
+                  className="ml-2 text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                >
+                  立即註冊
+                </Link>
+              )}
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuid } from 'uuid';
 import { config } from '../../config';
 import { AppError } from '../../middleware/errorHandler';
+import { localUploadService } from './local-upload.service';
 
 // ==================== 類型定義 ====================
 
@@ -47,7 +48,11 @@ export class UploadService {
       const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
       if (!accessKeyId || !secretAccessKey) {
-        throw new AppError('S3 未配置', 503, 'S3_NOT_CONFIGURED');
+        throw new AppError(
+          'S3 未配置，請設定 AWS_ACCESS_KEY_ID 和 AWS_SECRET_ACCESS_KEY 環境變數',
+          503,
+          'S3_NOT_CONFIGURED'
+        );
       }
 
       this.s3Client = new S3Client({
@@ -59,6 +64,18 @@ export class UploadService {
       });
     }
     return this.s3Client;
+  }
+
+  /**
+   * 檢查是否使用本地儲存
+   */
+  private useLocalStorage(): boolean {
+    const bucket = process.env.S3_BUCKET || process.env.AWS_S3_BUCKET;
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+    
+    // 如果 S3 未配置，使用本地儲存
+    return !bucket || !accessKeyId || !secretAccessKey;
   }
 
   /**
@@ -85,9 +102,14 @@ export class UploadService {
       );
     }
 
-    const bucket = process.env.S3_BUCKET;
+    // 如果 S3 未配置，使用本地儲存
+    if (this.useLocalStorage()) {
+      return localUploadService.generatePresignedUrl(input);
+    }
+
+    const bucket = process.env.S3_BUCKET || process.env.AWS_S3_BUCKET;
     if (!bucket) {
-      throw new AppError('S3 Bucket 未配置', 503, 'S3_NOT_CONFIGURED');
+      throw new AppError('S3 Bucket 未配置，請設定 S3_BUCKET 或 AWS_S3_BUCKET 環境變數', 503, 'S3_NOT_CONFIGURED');
     }
 
     // 生成唯一的 key
@@ -127,6 +149,10 @@ export class UploadService {
   async generateMultiplePresignedUrls(
     inputs: PresignRequest[]
   ): Promise<PresignResponse[]> {
+    // 如果使用本地儲存，使用本地服務
+    if (this.useLocalStorage()) {
+      return localUploadService.generateMultiplePresignedUrls(inputs);
+    }
     return Promise.all(inputs.map(input => this.generatePresignedUrl(input)));
   }
 }
