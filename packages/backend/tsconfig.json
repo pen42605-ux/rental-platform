@@ -20,7 +20,12 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/modules/payment"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/modules/payment",
+    "src/modules/payment/**/*"
+  ]
 }
 
 
