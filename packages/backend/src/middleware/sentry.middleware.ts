@@ -1,7 +1,7 @@
 /**
  * Sentry 錯誤追蹤中間件
  */
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import * as Sentry from '@sentry/node';
 import { AuthRequest } from './auth.middleware';
 
@@ -33,18 +33,20 @@ export function sentryTracingHandler() {
 
 /**
  * Sentry 錯誤處理中間件
+ * 明確標註回傳型別為 Express 的 ErrorRequestHandler，避免引用
+ * Sentry 內部的 MiddlewareError 型別導致 TS4058。
  */
-export function sentryErrorHandler() {
+export function sentryErrorHandler(): ErrorRequestHandler {
   return Sentry.Handlers.errorHandler({
     // 不自動捕獲 4xx 錯誤
     shouldHandleError(error) {
       // 只處理 5xx 錯誤和未預期的錯誤
-      if (error.status && error.status < 500) {
+      if ((error as any).status && (error as any).status < 500) {
         return false;
       }
       return true;
     },
-  });
+  }) as unknown as ErrorRequestHandler;
 }
 
 /**
