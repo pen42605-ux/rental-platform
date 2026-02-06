@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -16,8 +16,6 @@ import {
 import { paymentApi, Order, Payment } from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
 import toast from 'react-hot-toast';
-
-export const dynamic = 'force-dynamic';
 
 // 支付方式配置
 const PAYMENT_METHODS = [
@@ -51,7 +49,7 @@ const PAYMENT_METHODS = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
@@ -387,6 +385,20 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-secondary-500">
+          載入中...
+        </div>
+      }
+    >
+      <CheckoutPageInner />
+    </Suspense>
   );
 }
 

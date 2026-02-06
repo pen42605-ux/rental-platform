@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store';
-
-export const dynamic = 'force-dynamic';
 
 const ROLE_OPTIONS = [
   { value: 'USER', label: '房客/買家', icon: '👤', description: '尋找租屋或購屋' },
@@ -15,7 +13,7 @@ const ROLE_OPTIONS = [
   { value: 'DEVELOPER', label: '建商/代銷', icon: '🏗️', description: '開發商帳號' },
 ];
 
-export default function RoleSelectionPage() {
+function RoleSelectionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
@@ -152,6 +150,20 @@ export default function RoleSelectionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RoleSelectionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-secondary-500">
+          載入中...
+        </div>
+      }
+    >
+      <RoleSelectionPageInner />
+    </Suspense>
   );
 }
 

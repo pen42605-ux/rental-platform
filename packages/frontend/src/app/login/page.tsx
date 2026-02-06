@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
@@ -9,9 +9,7 @@ import { useAuthStore } from '@/lib/store';
 import toast from 'react-hot-toast';
 import FacebookLoginButton from '@/components/auth/FacebookLoginButton';
 
-export const dynamic = 'force-dynamic';
-
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
@@ -319,6 +317,20 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-secondary-500">
+          載入中...
+        </div>
+      }
+    >
+      <LoginPageInner />
+    </Suspense>
   );
 }
 
