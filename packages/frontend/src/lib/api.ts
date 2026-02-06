@@ -133,6 +133,13 @@ export interface SearchParams {
   city?: string;
   district?: string;
   amenities?: string;
+
+  // 前端常用 camelCase 參數（與後端/查詢字串命名可能不同）
+  minPrice?: number;
+  maxPrice?: number;
+  propertyType?: string;
+  sortBy?: string;
+  status?: string;
 }
 
 export interface PresignResponse {
