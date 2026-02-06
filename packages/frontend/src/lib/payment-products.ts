@@ -192,6 +192,30 @@ export interface ProductConfig {
   features?: string[];
 }
 
+/**
+ * 根據產品 ID 取得價格
+ */
+export function getProductPrice(productId: string): number {
+  const allProducts: Record<string, { price: number }> = {
+    ...RESIDENTIAL_LISTING_PLANS,
+    ...RESIDENTIAL_PACKAGES,
+    ...COMMERCIAL_PACKAGES,
+    ...SALE_PLANS,
+    ...SALE_PACKAGES,
+    ...ADDON_COMPUTER,
+    ...ADDON_MOBILE,
+  };
+
+  // 透過 id 欄位搜尋
+  for (const product of Object.values(allProducts)) {
+    if ((product as any).id === productId) {
+      return product.price;
+    }
+  }
+
+  return 0;
+}
+
 export const ADDON_MOBILE = {
   TOP: {
     id: 'ADDON_MOBILE_TOP',

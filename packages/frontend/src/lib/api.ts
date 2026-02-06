@@ -122,12 +122,17 @@ export interface SearchParams {
   q?: string;
   min_price?: number;
   max_price?: number;
+  minPrice?: number;
+  maxPrice?: number;
   type?: string;
+  propertyType?: string;
   beds?: number;
   lat?: number;
   lng?: number;
   radius_km?: number;
   sort?: string;
+  sortBy?: string;
+  status?: string;
   page?: number;
   limit?: number;
   city?: string;
@@ -241,6 +246,7 @@ export interface Order {
     unitPrice: number;
     totalPrice: number;
   }>;
+  payments?: Payment[];
   createdAt: string;
   expiresAt: string | null;
 }

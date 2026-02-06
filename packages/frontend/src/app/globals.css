@@ -4,59 +4,116 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ======================================
+   shadcn/ui CSS Variables (Design Tokens)
+   ====================================== */
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 28% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    --primary: 22 81% 51%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 24% 89%;
+    --secondary-foreground: 215 28% 17%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 215 28% 17%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 22 81% 51%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 215 28% 10%;
+    --foreground: 0 0% 95%;
+    --card: 215 28% 13%;
+    --card-foreground: 0 0% 95%;
+    --popover: 215 28% 13%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 22 81% 51%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 16% 65%;
+    --accent: 215 28% 17%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 215 28% 20%;
+    --input: 215 28% 20%;
+    --ring: 22 81% 51%;
+  }
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
     @apply antialiased text-secondary-900 bg-gray-50;
   }
+
+  * {
+    @apply border-border;
+  }
 }
 
+/* ======================================
+   Custom Component Utilities
+   ====================================== */
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
   }
-  
+
   .btn-primary {
     @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30;
   }
-  
+
   .btn-secondary {
     @apply btn bg-white text-secondary-700 border border-secondary-200 hover:bg-secondary-50 focus:ring-secondary-500;
   }
-  
+
   .btn-ghost {
     @apply btn text-secondary-600 hover:bg-secondary-100 focus:ring-secondary-500;
   }
-  
+
   .input {
     @apply block w-full px-4 py-3 rounded-xl border border-secondary-200 bg-white text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200;
   }
-  
+
   .card {
     @apply bg-white rounded-2xl shadow-sm border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow duration-300;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
   }
-  
+
   .badge-primary {
     @apply badge bg-primary-100 text-primary-700;
   }
-  
+
   .badge-success {
     @apply badge bg-emerald-100 text-emerald-700;
   }
-  
+
   .badge-warning {
     @apply badge bg-amber-100 text-amber-700;
   }
 }
 
-/* Leaflet 地圖樣式覆蓋 */
+/* ======================================
+   Leaflet Map Style Overrides
+   ====================================== */
 .leaflet-container {
   @apply rounded-xl;
   font-family: inherit;
@@ -66,7 +123,9 @@
   @apply rounded-xl shadow-lg;
 }
 
-/* 自訂滾動條 */
+/* ======================================
+   Custom Scrollbar
+   ====================================== */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -80,24 +139,11 @@
   @apply bg-secondary-300 rounded-full hover:bg-secondary-400;
 }
 
-/* 動畫 */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
+/* ======================================
+   Skeleton/Shimmer Animation
+   ====================================== */
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
 }
-
-
-
-
-
-
