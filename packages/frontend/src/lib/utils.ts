@@ -2,10 +2,11 @@
  * 工具函數
  */
 import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-// 合併 className
+// 合併 className（支援 tailwind-merge 智慧合併）
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs));
 }
 
 // 格式化價格

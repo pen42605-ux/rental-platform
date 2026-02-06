@@ -23,6 +23,20 @@ import {
   ADDON_MOBILE,
 } from '@/lib/payment-products';
 
+// 根據產品 ID 取得價格
+function getProductPrice(productId: string): number {
+  const allProducts: Record<string, number> = {
+    ...Object.fromEntries(Object.values(RESIDENTIAL_LISTING_PLANS).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(RESIDENTIAL_PACKAGES).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(COMMERCIAL_PACKAGES).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(SALE_PLANS).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(SALE_PACKAGES).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(ADDON_COMPUTER).map(p => [p.id, p.price])),
+    ...Object.fromEntries(Object.values(ADDON_MOBILE).map(p => [p.id, p.price])),
+  };
+  return allProducts[productId] || 0;
+}
+
 export default function SelectPlanPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();

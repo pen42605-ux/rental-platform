@@ -72,7 +72,7 @@ export default function OrdersPage() {
         status: selectedStatus || undefined,
       });
       setOrders(response.data.data.items);
-      setPagination(response.data.pagination);
+      setPagination((response.data as any).pagination);
     } catch (error: any) {
       toast.error(error.response?.data?.error || '載入訂單失敗');
     } finally {

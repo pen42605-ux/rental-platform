@@ -82,8 +82,9 @@ export default function CheckoutPage() {
       setOrder(response.data.data);
       
       // 如果有未完成的付款，載入付款資訊
-      if (response.data.data.payments && response.data.data.payments.length > 0) {
-        const latestPayment = response.data.data.payments[0];
+      const orderData = response.data.data as any;
+      if (orderData.payments && orderData.payments.length > 0) {
+        const latestPayment = orderData.payments[0];
         if (latestPayment.status === 'PENDING') {
           setPayment(latestPayment);
         }
