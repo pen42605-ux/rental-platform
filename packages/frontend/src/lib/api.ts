@@ -281,7 +281,7 @@ export const paymentApi = {
 
   // 獲取訂單列表
   getOrders: (params?: { page?: number; limit?: number; status?: string }) =>
-    api.get<ApiResponse<{ items: Order[]; pagination: any }>>('/api/payment/orders', { params }),
+    api.get<ApiResponse<PaginatedResponse<Order>>>('/api/payment/orders', { params }),
 
   // 獲取訂單詳情
   getOrder: (id: string) =>

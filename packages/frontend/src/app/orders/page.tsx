@@ -51,7 +51,7 @@ export default function OrdersPage() {
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
-    total: 0,
+    totalItems: 0,
     totalPages: 0,
   });
   const [selectedStatus, setSelectedStatus] = useState<string>('');
@@ -72,7 +72,7 @@ export default function OrdersPage() {
         status: selectedStatus || undefined,
       });
       setOrders(response.data.data.items);
-      setPagination(response.data.pagination);
+      setPagination(response.data.data.pagination);
     } catch (error: any) {
       toast.error(error.response?.data?.error || '載入訂單失敗');
     } finally {
