@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store';
 
+export const dynamic = 'force-dynamic';
+
 const ROLE_OPTIONS = [
   { value: 'USER', label: '房客/買家', icon: '👤', description: '尋找租屋或購屋' },
   { value: 'LANDLORD', label: '屋主/代理人', icon: '🏠', description: '出租或出售房屋', warning: '若為合法經紀業人員不得冒用"屋主/代理人"身份註冊' },

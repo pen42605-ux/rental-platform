@@ -15,6 +15,8 @@ import { formatPrice } from '@/lib/utils';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
 
+export const dynamic = 'force-dynamic';
+
 interface Listing {
   id: string;
   title: string;

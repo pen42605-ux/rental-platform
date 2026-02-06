@@ -13,6 +13,8 @@ import { api } from '@/lib/api';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
 
+export const dynamic = 'force-dynamic';
+
 interface User {
   id: string;
   email: string;

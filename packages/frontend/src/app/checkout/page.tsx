@@ -17,6 +17,8 @@ import { paymentApi, Order, Payment } from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
 import toast from 'react-hot-toast';
 
+export const dynamic = 'force-dynamic';
+
 // 支付方式配置
 const PAYMENT_METHODS = [
   {

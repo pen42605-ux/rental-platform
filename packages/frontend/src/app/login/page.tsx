@@ -9,6 +9,8 @@ import { useAuthStore } from '@/lib/store';
 import toast from 'react-hot-toast';
 import FacebookLoginButton from '@/components/auth/FacebookLoginButton';
 
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
