@@ -2,10 +2,11 @@
  * 工具函數
  */
 import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 // 合併 className
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs));
 }
 
 // 格式化價格
@@ -103,9 +104,3 @@ export function formatRelativeTime(dateString: string): string {
   if (diffDays < 365) return `${Math.floor(diffDays / 30)} 個月前`;
   return `${Math.floor(diffDays / 365)} 年前`;
 }
-
-
-
-
-
-
