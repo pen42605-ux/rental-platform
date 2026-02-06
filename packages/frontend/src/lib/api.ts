@@ -128,6 +128,8 @@ export interface SearchParams {
   lng?: number;
   radius_km?: number;
   sort?: string;
+  sortBy?: string;
+  status?: 'DRAFT' | 'PUBLISHED' | 'REMOVED' | string;
   page?: number;
   limit?: number;
   city?: string;
