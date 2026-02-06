@@ -241,6 +241,7 @@ export interface Order {
     unitPrice: number;
     totalPrice: number;
   }>;
+  payments?: Payment[];
   createdAt: string;
   expiresAt: string | null;
 }
