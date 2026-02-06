@@ -11,6 +11,8 @@ import FacebookLoginButton from '@/components/auth/FacebookLoginButton';
 import { CITIES } from '@/lib/utils';
 import { getDistrictsByCity } from '@/lib/districts';
 
+export const dynamic = 'force-dynamic';
+
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
