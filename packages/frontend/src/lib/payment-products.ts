@@ -211,3 +211,28 @@ export const ADDON_MOBILE = {
   },
 };
 
+/**
+ * 以產品 id 查詢配置/價格（給 pricing/checkout 等頁面使用）
+ */
+const ALL_PRODUCTS: ProductConfig[] = [
+  ...Object.values(RESIDENTIAL_LISTING_PLANS),
+  ...Object.values(RESIDENTIAL_PACKAGES),
+  ...Object.values(COMMERCIAL_PACKAGES),
+  ...Object.values(SALE_PLANS),
+  ...Object.values(SALE_PACKAGES),
+  ...Object.values(ADDON_COMPUTER),
+  ...Object.values(ADDON_MOBILE),
+] as unknown as ProductConfig[];
+
+const PRODUCT_BY_ID = Object.fromEntries(
+  ALL_PRODUCTS.map((p) => [p.id, p])
+) as Record<string, ProductConfig>;
+
+export function getProductById(productId: string): ProductConfig | undefined {
+  return PRODUCT_BY_ID[productId];
+}
+
+export function getProductPrice(productId: string): number {
+  return PRODUCT_BY_ID[productId]?.price ?? 0;
+}
+
