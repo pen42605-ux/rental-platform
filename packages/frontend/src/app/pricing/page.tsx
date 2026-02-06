@@ -121,7 +121,7 @@ export default function PricingPage() {
                       </td>
                     </tr>
                     <tr className="border-b border-blue-100 bg-blue-50/30">
-                      <td className="px-4 py-3 text-sm text-gray-700">首頁、列表頁 "為您精選" 區</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">首頁、列表頁 &quot;為您精選&quot; 區</td>
                       <td className="px-4 py-3 text-center text-gray-500">—</td>
                       <td className="px-4 py-3 text-center bg-gradient-to-r from-yellow-50/30 to-orange-50/30">
                         <CheckCircleIcon className="w-5 h-5 text-green-500 mx-auto" />
