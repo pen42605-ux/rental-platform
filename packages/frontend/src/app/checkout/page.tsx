@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -51,7 +51,7 @@ const PAYMENT_METHODS = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
@@ -387,6 +387,20 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-gray-600">
+          載入中...
+        </div>
+      }
+    >
+      <CheckoutPageInner />
+    </Suspense>
   );
 }
 

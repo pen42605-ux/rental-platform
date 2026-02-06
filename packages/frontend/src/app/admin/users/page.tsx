@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   MagnifyingGlassIcon,
@@ -46,7 +46,7 @@ const roleStyles: Record<string, string> = {
   ADMIN: 'bg-purple-500/20 text-purple-400',
 };
 
-export default function AdminUsersPage() {
+function AdminUsersPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
@@ -415,6 +415,20 @@ export default function AdminUsersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminUsersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-slate-400">
+          載入中...
+        </div>
+      }
+    >
+      <AdminUsersPageInner />
+    </Suspense>
   );
 }
 
