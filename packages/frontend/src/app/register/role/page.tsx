@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store';
@@ -13,7 +13,7 @@ const ROLE_OPTIONS = [
   { value: 'DEVELOPER', label: '建商/代銷', icon: '🏗️', description: '開發商帳號' },
 ];
 
-export default function RoleSelectionPage() {
+function RoleSelectionPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
@@ -150,6 +150,14 @@ export default function RoleSelectionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RoleSelectionPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-900" />}>
+      <RoleSelectionPageInner />
+    </Suspense>
   );
 }
 
