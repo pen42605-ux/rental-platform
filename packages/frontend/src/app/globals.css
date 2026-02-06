@@ -5,12 +5,85 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Brand (align with existing Tailwind palette) */
+    --background: 210 20% 98%; /* gray-50 */
+    --foreground: 213 38.2% 24.1%; /* secondary-900 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 213 38.2% 24.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 38.2% 24.1%;
+
+    --primary: 24 82% 52%; /* primary-500 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 43.8% 93.7%; /* secondary-100 */
+    --secondary-foreground: 213 38.2% 24.1%;
+
+    --muted: 214 46.7% 97.1%;
+    --muted-foreground: 209 43.5% 48.6%; /* secondary-500 */
+    --accent: 214 43.8% 93.7%;
+    --accent-foreground: 213 38.2% 24.1%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214 43.8% 93.7%;
+    --input: 214 43.8% 93.7%;
+    --ring: 24 82% 52%;
+
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 213 38.2% 10%;
+    --foreground: 0 0% 98%;
+
+    --card: 213 38.2% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 213 38.2% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 24 82% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 213 20% 18%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 213 20% 18%;
+    --muted-foreground: 214 15% 70%;
+    --accent: 213 20% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 213 20% 18%;
+    --input: 213 20% 18%;
+    --ring: 24 82% 52%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
   html {
     scroll-behavior: smooth;
   }
   
   body {
-    @apply antialiased text-secondary-900 bg-gray-50;
+    @apply antialiased bg-background text-foreground;
   }
 }
 
@@ -95,9 +168,3 @@
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
 }
-
-
-
-
-
-
