@@ -128,11 +128,16 @@ export interface SearchParams {
   lng?: number;
   radius_km?: number;
   sort?: string;
+  sortBy?: string;
   page?: number;
   limit?: number;
   city?: string;
   district?: string;
   amenities?: string;
+  status?: string;
+  propertyType?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface PresignResponse {
