@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -66,7 +66,7 @@ const propertyTypeLabels: Record<string, string> = {
   PARKING: '車位',
 };
 
-export default function AdminListingsPage() {
+function AdminListingsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -406,6 +406,20 @@ export default function AdminListingsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminListingsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+          <div className="text-slate-300">載入中...</div>
+        </div>
+      }
+    >
+      <AdminListingsPageInner />
+    </Suspense>
   );
 }
 
