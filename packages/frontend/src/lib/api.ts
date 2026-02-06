@@ -234,6 +234,7 @@ export interface Order {
   status: string;
   totalAmount: number;
   currency: string;
+  payments?: Payment[];
   items: Array<{
     id: string;
     productName: string;
