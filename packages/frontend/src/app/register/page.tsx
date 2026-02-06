@@ -679,7 +679,7 @@ export default function RegisterPage() {
                   </div>
                   {role === 'LANDLORD' && (
                     <p className="text-xs text-amber-400 mt-1">
-                      ⚠️ 若為合法經紀業人員不得冒用"屋主/代理人"身份註冊
+                      ⚠️ 若為合法經紀業人員不得冒用「屋主/代理人」身份註冊
                     </p>
                   )}
                 </div>
