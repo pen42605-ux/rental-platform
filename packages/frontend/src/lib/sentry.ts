@@ -26,25 +26,8 @@ export function initSentry() {
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
-    // 注意：不同版本的 @sentry/nextjs 對 integrations API 可能有差異
-    // 這裡用 (Sentry as any) 做向後相容，避免 build 時因未導出而失敗
-    integrations: (() => {
-      const integrations: any[] = [];
-      const replayIntegration = (Sentry as any).replayIntegration;
-      if (typeof replayIntegration === 'function') {
-        integrations.push(
-          replayIntegration({
-            maskAllText: true,
-            blockAllMedia: true,
-          })
-        );
-      }
-      const browserTracingIntegration = (Sentry as any).browserTracingIntegration;
-      if (typeof browserTracingIntegration === 'function') {
-        integrations.push(browserTracingIntegration());
-      }
-      return integrations;
-    })(),
+    // integrations 依版本差異較大，這裡先保持空陣列，避免 Next build 因未導出而失敗
+    integrations: [],
     // 過濾敏感資訊
     beforeSend(event, hint) {
       // 移除敏感資訊
