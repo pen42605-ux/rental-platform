@@ -192,6 +192,23 @@ export interface ProductConfig {
   features?: string[];
 }
 
+// 所有產品的價格查找表
+const ALL_PRODUCTS: Record<string, number> = {
+  ...Object.fromEntries(Object.values(RESIDENTIAL_LISTING_PLANS).map(p => [p.id, p.price])),
+  ...Object.fromEntries(Object.values(RESIDENTIAL_PACKAGES).map(p => [p.id, p.price])),
+  ...Object.fromEntries(Object.values(COMMERCIAL_PACKAGES).map(p => [p.id, p.price])),
+  ...Object.fromEntries(Object.values(SALE_PLANS).map(p => [p.id, p.price])),
+  ...Object.fromEntries(Object.values(SALE_PACKAGES).map(p => [p.id, p.price])),
+  ...Object.fromEntries(Object.values(ADDON_COMPUTER).map(p => [p.id, p.price])),
+};
+
+/**
+ * 根據產品 ID 獲取價格
+ */
+export function getProductPrice(productId: string): number {
+  return ALL_PRODUCTS[productId] || 0;
+}
+
 export const ADDON_MOBILE = {
   TOP: {
     id: 'ADDON_MOBILE_TOP',

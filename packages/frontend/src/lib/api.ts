@@ -122,17 +122,22 @@ export interface SearchParams {
   q?: string;
   min_price?: number;
   max_price?: number;
+  minPrice?: number;
+  maxPrice?: number;
   type?: string;
+  propertyType?: string;
   beds?: number;
   lat?: number;
   lng?: number;
   radius_km?: number;
   sort?: string;
+  sortBy?: string;
   page?: number;
   limit?: number;
   city?: string;
   district?: string;
   amenities?: string;
+  status?: string;
 }
 
 export interface PresignResponse {
@@ -241,6 +246,7 @@ export interface Order {
     unitPrice: number;
     totalPrice: number;
   }>;
+  payments?: Payment[];
   createdAt: string;
   expiresAt: string | null;
 }

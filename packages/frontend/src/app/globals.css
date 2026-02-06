@@ -5,12 +5,78 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 20% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 20% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 20% 20%;
+
+    --primary: 22 82% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 213 30% 90%;
+    --secondary-foreground: 213 30% 30%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 210 10% 45%;
+
+    --accent: 210 20% 96%;
+    --accent-foreground: 210 20% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 22 82% 51%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 210 20% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 210 20% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 210 20% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 22 82% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 20% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 210 20% 15%;
+    --muted-foreground: 210 10% 55%;
+
+    --accent: 210 20% 15%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 210 20% 18%;
+    --input: 210 20% 18%;
+    --ring: 22 82% 51%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply antialiased text-secondary-900 bg-gray-50;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
@@ -18,45 +84,45 @@
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
   }
-  
+
   .btn-primary {
     @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30;
   }
-  
+
   .btn-secondary {
     @apply btn bg-white text-secondary-700 border border-secondary-200 hover:bg-secondary-50 focus:ring-secondary-500;
   }
-  
+
   .btn-ghost {
     @apply btn text-secondary-600 hover:bg-secondary-100 focus:ring-secondary-500;
   }
-  
-  .input {
+
+  .input-field {
     @apply block w-full px-4 py-3 rounded-xl border border-secondary-200 bg-white text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200;
   }
-  
+
   .card {
     @apply bg-white rounded-2xl shadow-sm border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow duration-300;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
   }
-  
+
   .badge-primary {
     @apply badge bg-primary-100 text-primary-700;
   }
-  
+
   .badge-success {
     @apply badge bg-emerald-100 text-emerald-700;
   }
-  
+
   .badge-warning {
     @apply badge bg-amber-100 text-amber-700;
   }
 }
 
-/* Leaflet 地圖樣式覆蓋 */
+/* Leaflet map style overrides */
 .leaflet-container {
   @apply rounded-xl;
   font-family: inherit;
@@ -66,7 +132,7 @@
   @apply rounded-xl shadow-lg;
 }
 
-/* 自訂滾動條 */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -80,7 +146,7 @@
   @apply bg-secondary-300 rounded-full hover:bg-secondary-400;
 }
 
-/* 動畫 */
+/* Shimmer animation */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -95,9 +161,3 @@
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
 }
-
-
-
-
-
-
