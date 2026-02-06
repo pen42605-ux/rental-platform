@@ -211,3 +211,30 @@ export const ADDON_MOBILE = {
   },
 };
 
+/**
+ * Helpers
+ */
+const PRODUCT_GROUPS = [
+  RESIDENTIAL_LISTING_PLANS,
+  RESIDENTIAL_PACKAGES,
+  COMMERCIAL_PACKAGES,
+  SALE_PLANS,
+  SALE_PACKAGES,
+  ADDON_COMPUTER,
+  ADDON_MOBILE,
+] as const;
+
+export function getProductById(productId: string): ProductConfig | undefined {
+  for (const group of PRODUCT_GROUPS) {
+    for (const product of Object.values(group as Record<string, unknown>)) {
+      const p = product as ProductConfig;
+      if (p?.id === productId) return p;
+    }
+  }
+  return undefined;
+}
+
+export function getProductPrice(productId: string): number {
+  return getProductById(productId)?.price ?? 0;
+}
+
