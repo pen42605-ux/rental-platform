@@ -211,3 +211,21 @@ export const ADDON_MOBILE = {
   },
 };
 
+const ALL_PRODUCTS: ProductConfig[] = [
+  ...Object.values(RESIDENTIAL_LISTING_PLANS),
+  ...Object.values(RESIDENTIAL_PACKAGES),
+  ...Object.values(COMMERCIAL_PACKAGES),
+  ...Object.values(SALE_PLANS),
+  ...Object.values(SALE_PACKAGES),
+  ...Object.values(ADDON_COMPUTER),
+  ...Object.values(ADDON_MOBILE),
+];
+
+export function getProductConfig(productId: string): ProductConfig | undefined {
+  return ALL_PRODUCTS.find((p) => p.id === productId);
+}
+
+export function getProductPrice(productId: string): number {
+  return getProductConfig(productId)?.price ?? 0;
+}
+

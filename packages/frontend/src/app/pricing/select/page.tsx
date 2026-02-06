@@ -21,6 +21,7 @@ import {
   SALE_PACKAGES,
   ADDON_COMPUTER,
   ADDON_MOBILE,
+  getProductPrice,
 } from '@/lib/payment-products';
 
 export default function SelectPlanPage() {
