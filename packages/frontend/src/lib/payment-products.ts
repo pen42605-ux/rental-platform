@@ -211,3 +211,21 @@ export const ADDON_MOBILE = {
   },
 };
 
+/**
+ * 依 productId 取得價格（單位：分）
+ * 用於方案選擇頁計算總金額
+ */
+export function getProductPrice(productId: string): number {
+  const allProducts: Array<{ id: string; price: number }> = [
+    ...Object.values(RESIDENTIAL_LISTING_PLANS),
+    ...Object.values(RESIDENTIAL_PACKAGES),
+    ...Object.values(COMMERCIAL_PACKAGES),
+    ...Object.values(SALE_PLANS),
+    ...Object.values(SALE_PACKAGES),
+    ...Object.values(ADDON_COMPUTER),
+    ...Object.values(ADDON_MOBILE),
+  ] as any;
+
+  return allProducts.find((p) => p.id === productId)?.price ?? 0;
+}
+
